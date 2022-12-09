@@ -1,30 +1,51 @@
 import { StatusBar } from 'expo-status-bar';
-import {Button, Dimensions, FlatList, Image, StyleSheet, Switch, Text, View} from 'react-native';
-import {useState} from "react";
-
-
+import {
+  Alert,
+  Button,
+  Dimensions,
+  FlatList,
+  Image,
+  Modal,
+  Pressable,
+  StyleSheet,
+  Switch,
+  Text,
+  View
+} from 'react-native';
+import React, {useState} from "react";
+import FavoriteSuccessModal from "./src/compnents/modals/favoriteModal/FavoriteSuccessModal";
 
 const data = [
   {id: 0, name: 'cafe one', image: "https://www.cenuta.com/blog/wp-content/uploads/2022/08/cafe-isimleri.jpg", isFavorite: true},
   {id: 1, name: 'cafe two', image: 'https://www.cenuta.com/blog/wp-content/uploads/2022/08/cafe-isimleri.jpg' , isFavorite: true},
-  {id: 2, name: 'cafe three', image: 'https://serbethane.com.tr/resimler/slide/slide-803.jpg' , isFavorite: false},
-  {id: 3, name: 'cafe four', image: 'https://serbethane.com.tr/resimler/slide/slide-495.jpg' , isFavorite: false},
+  {id: 2, name: 'cafe three', image: 'https://serbethane.com.tr/resimler/slide/slide-803.jpg' , isFavorite: true},
+  {id: 3, name: 'cafe four', image: 'https://serbethane.com.tr/resimler/slide/slide-495.jpg' , isFavorite: true},
   {id: 4, name: 'cafe five', image: 'https://media-cdn.tripadvisor.com/media/photo-s/18/34/66/86/bahcesi-de-var.jpg' , isFavorite: true},
 ];
 
 export default function App() {
+  let datas = [];
   const [cafeList, setCafeList] = useState(data);
+  const [allData, setAllData] = useState(data);
+
   const [favoriteCafeStatus, setFavoriteCafeStatus] = useState(false);
+
+  if(!favoriteCafeStatus){
+    datas = allData;
+  }else{
+    datas = cafeList;
+  }
 
   function changeFavoriteCafeStatus(isFavorite){
     setFavoriteCafeStatus(isFavorite);
 
     if(isFavorite){
-      setCafeList(cafeList.filter((cafe) => cafe.isFavorite));
+      setCafeList(datas.filter((cafe) => cafe.isFavorite));
     }else {
-       setCafeList(cafeList)
+      setCafeList(allData);
     }
   }
+
 
 
   function favoriteStatusUpdate(favoriteStatus ,ids){
@@ -34,11 +55,10 @@ export default function App() {
     else{
       favoriteStatus = false;
     }
-    setCafeList(cafeList.map(el => el.id === ids ? {
-      ...el,
-      isFavorite: favoriteStatus }:
-      el));
-
+    setAllData(allData.map(el => el.id === ids ? {
+          ...el,
+          isFavorite: favoriteStatus }:
+        el));
   }
 
   function getCafeList(item){
@@ -55,7 +75,7 @@ export default function App() {
             </View>
             <View style={styles.add_favorite_button}>
               <Button title="Add Favorite" color="#a3b989" onPress={() => favoriteStatusUpdate(item.isFavorite,
-                  item.id)}/>
+                  item.id) }/>
             </View>
           </View>
       );
@@ -69,6 +89,10 @@ export default function App() {
               <Text style={styles.cafe_name_text}>
                 {item.name}
               </Text>
+            </View>
+            <View style={styles.add_favorite_button}>
+              <Button title="Remove Favorite" color="#991119" onPress={() => favoriteStatusUpdate(item.isFavorite,
+                  item.id)}/>
             </View>
           </View>
       );
@@ -88,7 +112,7 @@ export default function App() {
         </Text>
         <Switch value={favoriteCafeStatus} onValueChange={changeFavoriteCafeStatus}/>
       </View>
-      <FlatList horizontal={false} showsVerticalScrollIndicator={false} data={cafeList} renderItem={({item}) => getCafeList(item)} keyExtractor={(item, index) => index.toString()} />
+      <FlatList horizontal={false} showsVerticalScrollIndicator={false} data={datas} renderItem={({item}) => getCafeList(item)} keyExtractor={(item, index) => index.toString()} />
     </View>
   );
 }
@@ -144,5 +168,46 @@ const styles = StyleSheet.create({
   },
   add_favorite_button:{
     marginTop: 8,
+  },
+  centeredView: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 22
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: "white",
+    borderRadius: 20,
+    padding: 35,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5
+  },
+  button: {
+    borderRadius: 20,
+    padding: 10,
+    elevation: 2
+  },
+  buttonOpen: {
+    backgroundColor: "#F194FF",
+  },
+  buttonClose: {
+    backgroundColor: "#2196F3",
+  },
+  textStyle: {
+    color: "white",
+    fontWeight: "bold",
+    textAlign: "center"
+  },
+  modalText: {
+    marginBottom: 15,
+    textAlign: "center"
   }
 });
